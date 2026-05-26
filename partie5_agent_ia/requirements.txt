@@ -1,0 +1,5 @@
+# Partie 5 — Agent IA (Google ADK + Ollama)
+# Méthode recommandée : uv sync (voir README)
+# Méthode alternative : pip install -r requirements.txt
+
+google-adk[extensions]

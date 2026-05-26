@@ -18,7 +18,7 @@ from .tools import (
 # ─── Modèle ───────────────────────────────────────────────────────────────────
 # Modèle local par défaut. Pour basculer sur un endpoint distant (cf. partie 6
 # de l'atelier), remplacez les trois lignes ci-dessous et adaptez LiteLlm().
-MODEL_ID = "ollama/qwen3:4b"
+MODEL_ID = "ollama_chat/qwen3.5:4b"
 
 # Exemple endpoint distant :
 # MODEL_ID    = "openai/<model_name>"

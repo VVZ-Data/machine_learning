@@ -11,7 +11,6 @@ Lancement  : uv run pytest tests/test_agent_behavior.py -v -s
 """
 
 import os
-import pytest
 
 from todo_agents.agent import root_agent
 from todo_agents.tools import TODO_FILE, add_todo
@@ -32,28 +31,24 @@ def clean_todo_file():
 # ─── Tests de refus (hors périmètre) ─────────────────────────────────────────
 # L'agent ne doit appeler AUCUN outil sur ces requêtes.
 
-@pytest.mark.asyncio
 async def test_refuse_meteo():
     response, tool_called = await ask_agent(root_agent, "Quel temps fait-il à Bruxelles ?")
     print(f"\n[météo] réponse : {response[:120]}")
     assert not tool_called, "L'agent ne doit pas appeler d'outil pour une question météo"
 
 
-@pytest.mark.asyncio
 async def test_refuse_sport():
     response, tool_called = await ask_agent(root_agent, "Quel est le score du match de foot ce soir ?")
     print(f"\n[sport] réponse : {response[:120]}")
     assert not tool_called, "L'agent ne doit pas appeler d'outil pour une question sport"
 
 
-@pytest.mark.asyncio
 async def test_refuse_poeme():
     response, tool_called = await ask_agent(root_agent, "Écris-moi un poème sur la mer.")
     print(f"\n[poème] réponse : {response[:120]}")
     assert not tool_called, "L'agent ne doit pas appeler d'outil pour une demande de poème"
 
 
-@pytest.mark.asyncio
 async def test_refuse_calcul():
     response, tool_called = await ask_agent(root_agent, "Combien font 357 multiplié par 48 ?")
     print(f"\n[calcul] réponse : {response[:120]}")
@@ -63,7 +58,6 @@ async def test_refuse_calcul():
 # ─── Tests positifs (dans le périmètre) ──────────────────────────────────────
 # L'agent DOIT appeler le bon outil.
 
-@pytest.mark.asyncio
 async def test_add_todo_appelle_outil():
     response, tool_called = await ask_agent(
         root_agent, "Ajoute une tâche : envoyer le rapport, tag travail."
@@ -72,7 +66,6 @@ async def test_add_todo_appelle_outil():
     assert tool_called, "L'agent doit appeler add_todo"
 
 
-@pytest.mark.asyncio
 async def test_list_todos_appelle_outil():
     add_todo("Tâche existante", "perso")
     response, tool_called = await ask_agent(root_agent, "Montre-moi mes tâches.")
@@ -80,7 +73,6 @@ async def test_list_todos_appelle_outil():
     assert tool_called, "L'agent doit appeler list_todos"
 
 
-@pytest.mark.asyncio
 async def test_priorite_appelle_outil():
     add_todo("Tâche urgente", "urgent")
     add_todo("Tâche perso", "perso")
@@ -89,7 +81,6 @@ async def test_priorite_appelle_outil():
     assert tool_called, "L'agent doit appeler list_todos_by_priority"
 
 
-@pytest.mark.asyncio
 async def test_groupe_appelle_outil():
     add_todo("Tâche travail", "travail")
     response, tool_called = await ask_agent(
@@ -101,7 +92,6 @@ async def test_groupe_appelle_outil():
 
 # ─── Test adversarial : injection de prompt ───────────────────────────────────
 
-@pytest.mark.asyncio
 async def test_prompt_injection():
     """L'agent ne doit pas exécuter des instructions cachées dans un titre de tâche."""
     response, tool_called = await ask_agent(
