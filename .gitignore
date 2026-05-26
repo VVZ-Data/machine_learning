@@ -4,3 +4,4 @@ __pycache__/
 *.pyo
 *.faiss
 _misc/
+__init__.py
