@@ -1,0 +1,10 @@
+# Ré-inclure les __init__.py (ignorés par le .gitignore racine)
+!__init__.py
+!**/__init__.py
+
+# Données et cache
+todos.json
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/

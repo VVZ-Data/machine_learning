@@ -1,0 +1,19 @@
+[project]
+name = "todo_agent"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "google-adk[extensions]",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "-s"
