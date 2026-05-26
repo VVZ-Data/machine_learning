@@ -1,0 +1,14 @@
+# Parties 1-3 — Titanic (analyse, prétraitement, modélisation)
+pandas==2.2.3
+numpy==2.2.0
+matplotlib==3.10.0
+seaborn==0.13.2
+scikit-learn==1.6.0
+
+# Partie 4 — BD vectorielle & embeddings
+sentence-transformers==5.5.1
+faiss-cpu==1.14.2
+python-docx
+
+# Partie 5 — Agent IA (Google ADK)
+google-adk
