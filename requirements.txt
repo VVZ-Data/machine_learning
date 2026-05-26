@@ -11,4 +11,4 @@ faiss-cpu==1.14.2
 python-docx
 
 # Partie 5 — Agent IA (Google ADK)
-google-adk
+google-adk[extensions]
