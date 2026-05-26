@@ -13,3 +13,9 @@ Dépôt des travaux du cours d'Intelligence Artificielle (2ème année, 2025-202
 | `partie4_vectordb_embeddings/` | Base de données vectorielle FAISS + classification d'articles par embeddings |
 | `partie5_agent_ia/` | Agent IA (outils, tests de comportement) |
 | `_misc/` | Fichiers divers / temporaires |
+
+## Installation
+
+```bash
+pip install -r requirements.txt
+```
