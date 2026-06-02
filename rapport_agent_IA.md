@@ -31,13 +31,13 @@ Les tests comportementaux (partie adversariale) requièrent une certaine créati
 
 ## 3. Analyse réflexive
 
-Travailler sur un agent IA en s'appuyant sur une IA pour le construire crée une mise en abyme intéressante. Il était d'autant plus important de rester rigoureux sur notre posture : **nous concevions, l'IA exécutait**. Comprendre pourquoi ADK expose les docstrings au LLM, pourquoi le function calling échoue sur certains modèles de petite taille, pourquoi un system prompt trop permissif laisse passer des requêtes hors-périmètre — tout cela ne pouvait pas être délégué. Ce sont précisément ces mécanismes qui font l'objet de l'évaluation.
+Travailler sur un agent IA en s'appuyant sur une IA pour le construire crée une mise en abyme intéressante. Il était d'autant plus important de rester rigoureux sur notre posture : **nous concevions, l'IA exécutait**. Pourquoi le function calling échoue sur certains modèles de petite taille, pourquoi un system prompt trop permissif laisse passer des requêtes hors-périmètre — tout cela ne pouvait pas être délégué. Ce sont précisément ces mécanismes qui font l'objet de l'évaluation.
 
 L'IA nous a été utile comme **interlocuteur critique** : nous lui présentions une approche, elle en évaluait la solidité. Cela nous a parfois évité des impasses techniques (mauvaise signature de fonction, mauvais placement des `async`) et nous a conduits à reconsidérer certains choix de formulation dans le system prompt. Mais dans tous les cas, le raisonnement et la décision finale étaient les nôtres.
 
 Un point de vigilance notable : les tests comportementaux sur LLM sont **non-déterministes par nature**. Un test de refus peut passer dix fois puis échouer sur la onzième requête sans que le code ait changé. L'IA ne nous a pas alertés spontanément sur cette propriété — c'est le labo de M. Suire qui en faisait explicitement un point pédagogique. Cela illustre qu'une IA générative n'est pas un bon juge de ses propres limites : la supervision humaine et le recours aux ressources pédagogiques primaires restent indispensables.
 
-Concernant le modèle local (`qwen3.5:4b`), nous avons pu observer concrètement les limites évoquées dans le labo : comportement variable selon les requêtes, inférence de tags parfois incorrecte, oubli occasionnel d'appeler un outil pour une action simple. Ces observations ont une vraie valeur pédagogique que l'utilisation d'un modèle distant aurait masquée.
+Nous n'avons malheureusement pas pu faire tourner l'agent en conditions réelles : nos machines ne disposaient pas de la puissance nécessaire pour exécuter le modèle local de façon stable. C'est un regret, car les observations sur le comportement de qwen3.5:4b évoquées dans le labo auraient été particulièrement instructives à constater par nous-mêmes. Nous restons néanmoins satisfaits du travail de réflexion mené autour du system prompt et de la conception des tests comportementaux, qui constituent selon nous la part la plus structurante de cet exercice.
 
 ---
 
