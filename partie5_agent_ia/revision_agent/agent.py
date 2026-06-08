@@ -10,7 +10,7 @@ from .tools import (
     get_stats,
 )
 
-MODEL_ID = "ollama_chat/qwen3:4b"
+MODEL_ID = "ollama_chat/qwen3.5:4b"
 
 SYSTEM_PROMPT = """
 Tu es un assistant de suivi de révisions d'examens.
