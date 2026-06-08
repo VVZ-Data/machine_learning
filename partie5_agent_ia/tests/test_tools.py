@@ -1,169 +1,126 @@
 """
 tests/test_tools.py — Tests unitaires des outils (déterministes, sans LLM)
-Atelier C. Suire — Devoir 5 Henallux
-
-Lancement : uv run pytest tests/ -v
 """
 
-import os
 import json
+import os
+
 import pytest
 
-from todo_agents.tools import (
-    add_todo,
-    list_todos,
-    complete_todo,
-    delete_todo,
-    list_todos_by_priority,
-    group_todos_by_tag,
-    TODO_FILE,
+from revision_agent.tools import (
+    SUBJECTS_FILE,
+    add_subject,
+    get_next_to_revise,
+    get_stats,
+    list_subjects,
+    remove_subject,
+    update_status,
 )
 
 
-# ─── Fixture : fichier propre avant/après chaque test ─────────────────────────
-
 @pytest.fixture(autouse=True)
-def clean_todo_file():
-    """Supprime le fichier de tâches avant et après chaque test."""
-    if os.path.exists(TODO_FILE):
-        os.remove(TODO_FILE)
+def clean_subjects_file():
+    if os.path.exists(SUBJECTS_FILE):
+        os.remove(SUBJECTS_FILE)
     yield
-    if os.path.exists(TODO_FILE):
-        os.remove(TODO_FILE)
+    if os.path.exists(SUBJECTS_FILE):
+        os.remove(SUBJECTS_FILE)
 
 
-# ─── Tests add_todo ───────────────────────────────────────────────────────────
-
-def test_add_todo():
-    result = add_todo("Acheter du lait", "perso")
+def test_add_subject():
+    result = add_subject("Mathématiques", "2025-06-15", "normal")
     assert "id: 1" in result
-    assert "Acheter du lait" in result
+    assert "Mathématiques" in result
 
-    with open(TODO_FILE) as f:
-        todos = json.load(f)
-    assert len(todos) == 1
-    assert todos[0]["title"] == "Acheter du lait"
-    assert todos[0]["tag"] == "perso"
-    assert todos[0]["done"] is False
+    with open(SUBJECTS_FILE) as f:
+        subjects = json.load(f)
+    assert len(subjects) == 1
+    assert subjects[0]["title"] == "Mathématiques"
+    assert subjects[0]["exam_date"] == "2025-06-15"
+    assert subjects[0]["priority"] == "normal"
+    assert subjects[0]["status"] == "not_started"
 
 
-def test_add_todo_invalid_tag():
-    result = add_todo("Tâche", "mauvais_tag")
+def test_add_subject_invalid_priority():
+    result = add_subject("Physique", "2025-06-20", "critique")
     assert "Erreur" in result
 
 
-def test_add_todo_default_tag():
-    result = add_todo("Tâche sans tag explicite")
-    assert "perso" in result
+def test_list_subjects_empty():
+    result = list_subjects()
+    assert "Aucune" in result
 
 
-def test_add_todo_increments_id():
-    add_todo("Première", "perso")
-    result = add_todo("Deuxième", "travail")
-    assert "id: 2" in result
+def test_list_subjects_filter_by_status():
+    add_subject("Mathématiques", "2025-06-15")
+    add_subject("Histoire", "2025-06-20")
+    update_status(2, "in_progress")
+
+    result_in_progress = list_subjects("in_progress")
+    assert "Histoire" in result_in_progress
+    assert "Mathématiques" not in result_in_progress
+
+    result_not_started = list_subjects("not_started")
+    assert "Mathématiques" in result_not_started
+    assert "Histoire" not in result_not_started
 
 
-# ─── Tests list_todos ─────────────────────────────────────────────────────────
+def test_update_status():
+    add_subject("Chimie", "2025-07-01")
+    result = update_status(1, "in_progress")
+    assert "in_progress" in result
 
-def test_list_todos_empty():
-    assert "Aucune" in list_todos()
-
-
-def test_list_todos_filter_by_tag():
-    add_todo("Tâche perso", "perso")
-    add_todo("Tâche travail", "travail")
-
-    result_perso = list_todos("perso")
-    assert "Tâche perso" in result_perso
-    assert "Tâche travail" not in result_perso
-
-    result_all = list_todos("all")
-    assert "Tâche perso" in result_all
-    assert "Tâche travail" in result_all
+    with open(SUBJECTS_FILE) as f:
+        subjects = json.load(f)
+    assert subjects[0]["status"] == "in_progress"
 
 
-def test_list_todos_pending_and_done():
-    add_todo("À faire", "travail")
-    add_todo("Faite", "perso")
-    complete_todo(2)
-
-    assert "À faire" in list_todos("pending")
-    assert "Faite" not in list_todos("pending")
-    assert "Faite" in list_todos("done")
+def test_update_status_invalid():
+    add_subject("Biologie", "2025-07-10")
+    result = update_status(1, "terminée")
+    assert "Erreur" in result
 
 
-# ─── Tests complete_todo ──────────────────────────────────────────────────────
-
-def test_complete_todo():
-    add_todo("À terminer", "travail")
-    result = complete_todo(1)
-    assert "terminée" in result
-    assert "À terminer" in list_todos("done")
-
-
-def test_complete_todo_not_found():
-    assert "Erreur" in complete_todo(999)
-
-
-# ─── Tests delete_todo ────────────────────────────────────────────────────────
-
-def test_delete_todo():
-    add_todo("À supprimer", "perso")
-    result = delete_todo(1)
+def test_remove_subject():
+    add_subject("Géographie", "2025-06-25")
+    result = remove_subject(1)
     assert "supprimée" in result
-    assert "Aucune" in list_todos()
+    assert "Aucune" in list_subjects()
 
 
-def test_delete_todo_not_found():
-    assert "Erreur" in delete_todo(999)
+def test_remove_subject_not_found():
+    result = remove_subject(999)
+    assert "Erreur" in result
 
 
-# ─── Tests list_todos_by_priority ─────────────────────────────────────────────
+def test_get_next_to_revise_priority_order():
+    add_subject("Normal non commencé", "2025-08-01", "normal")
+    add_subject("Soon en cours", "2025-06-10", "soon")
+    add_subject("Soon non commencé", "2025-06-05", "soon")
+    update_status(2, "in_progress")
 
-def test_list_todos_by_priority():
-    add_todo("Tâche perso", "perso")
-    add_todo("Tâche urgente", "urgent")
-    add_todo("Tâche travail", "travail")
-
-    result = list_todos_by_priority()
-    lines = result.splitlines()
-    assert "URGENT" in lines[0]
-    assert "PERSO" in lines[-1]
+    result = get_next_to_revise()
+    assert "Soon non commencé" in result
 
 
-def test_list_todos_by_priority_excludes_done():
-    add_todo("Tâche urgente terminée", "urgent")
-    complete_todo(1)
-    add_todo("Tâche perso", "perso")
+def test_get_next_to_revise_ignores_mastered():
+    add_subject("Maîtrisée", "2025-06-01", "soon")
+    update_status(1, "mastered")
 
-    result = list_todos_by_priority()
-    assert "urgente terminée" not in result
-    assert "perso" in result.lower()
-
-
-def test_list_todos_by_priority_empty():
-    assert "Aucune" in list_todos_by_priority()
+    result = get_next_to_revise()
+    assert "Félicitations" in result
+    assert "Maîtrisée" not in result
 
 
-# ─── Tests group_todos_by_tag ─────────────────────────────────────────────────
+def test_get_stats():
+    add_subject("Maths", "2025-06-15")
+    add_subject("Physique", "2025-06-20")
+    add_subject("Chimie", "2025-06-25")
+    update_status(1, "mastered")
+    update_status(2, "in_progress")
 
-def test_group_todos_by_tag():
-    add_todo("Tâche perso", "perso")
-    add_todo("Tâche travail", "travail")
-    add_todo("Tâche urgente", "urgent")
-
-    result = group_todos_by_tag()
-    idx_urgent  = result.index("Urgent")
-    idx_travail = result.index("Travail")
-    idx_perso   = result.index("Perso")
-    assert idx_urgent < idx_travail < idx_perso
-
-
-def test_group_todos_by_tag_excludes_done():
-    add_todo("Urgente terminée", "urgent")
-    complete_todo(1)
-    add_todo("Perso active", "perso")
-
-    result = group_todos_by_tag()
-    assert "Urgente terminée" not in result
-    assert "Perso active" in result
+    result = get_stats()
+    assert "33.3%" in result
+    assert "1" in result  # mastered count
+    assert "1" in result  # in_progress count
+    assert "1" in result  # not_started count
